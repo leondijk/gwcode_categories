@@ -2,21 +2,11 @@
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 /*
 ============================================================
- This ExpressionEngine plugin was created by Leon Dijk
+ Created by Leon Dijk
  - http://gwcode.com/
-============================================================
- This plugin is licensed under a
- Creative Commons Attribution-NoDerivs 3.0 Unported License.
- - http://creativecommons.org/licenses/by-nd/3.0/
-============================================================
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
-KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
-OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+------------------------------------------------------------
+ This plugin is licensed under The BSD 3-Clause License.
+ - http://www.opensource.org/licenses/bsd-3-clause
 ============================================================
 */
 
