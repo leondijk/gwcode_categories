@@ -1034,6 +1034,15 @@ class Gwcode_categories {
 			}
 			// end: add depthX_start / depthX_end / depthX_start_count / depthX_end_count variable values
 
+			// start: add child_count variable for children
+			if ($this->categories[$gw_i]['parent_id']!=$this->categories[$gw_i-1]['parent_id']) {
+				$child_count = 1;
+			} else {
+				$child_count++;
+			}
+			$var_values_arr[$this->var_prefix.'child_count'] = $child_count;
+			// end: add child_count variable for children
+
 			// start: add custom category fields
 			if($this->custom_fields == 'yes' && !empty($this->custom_fields_arr)) {
 				foreach($this->custom_fields_arr as $cf_group_id => $cf_group_arr) {
