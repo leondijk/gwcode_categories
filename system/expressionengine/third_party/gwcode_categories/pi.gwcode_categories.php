@@ -1426,7 +1426,7 @@ class Gwcode_categories {
 	// Plugin Usage
 	// ----------------------------------------
 	// This function describes how the plugin is used.
-	function usage() {
+	public static function usage() {
 		ob_start();
 ?>
 The tag in its most simple form:
