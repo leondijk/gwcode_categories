@@ -707,7 +707,7 @@ class Gwcode_categories {
 			$this->_get_custom_fields();
 		}
 
-		// I fpublisher is installed and this is a draft, grab category data from the publisher table
+		// If publisher is installed and this is a draft, grab category data from the publisher table
 		if (isset(ee()->publisher_lib) AND ee()->publisher_lib->status=='draft') {
 			$category_posts_table = 'exp_publisher_category_posts';
 		} else {
