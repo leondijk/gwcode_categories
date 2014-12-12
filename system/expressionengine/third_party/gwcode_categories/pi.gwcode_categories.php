@@ -2,11 +2,21 @@
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 /*
 ============================================================
- Created by Leon Dijk
+ This ExpressionEngine plugin was created by Leon Dijk
  - http://gwcode.com/
-------------------------------------------------------------
- This plugin is licensed under The BSD 3-Clause License.
- - http://www.opensource.org/licenses/bsd-3-clause
+============================================================
+ This plugin is licensed under a
+ Creative Commons Attribution-NoDerivs 3.0 Unported License.
+ - http://creativecommons.org/licenses/by-nd/3.0/
+============================================================
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
+OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ============================================================
 */
 
@@ -241,7 +251,7 @@ class Gwcode_categories {
 			}
 			if(count($offset_count) > 2) {
 				$this->EE->TMPL->log_item('Error: you can only provide one or two values for the "offset" parameter.');
-				return;	
+				return;
 			}
 		}
 		$this->excl_group_id = $this->EE->TMPL->fetch_param('excl_group_id');
@@ -365,7 +375,7 @@ class Gwcode_categories {
 			return $this->_get_by_group_id();
 		}
 	} // end function _get_by_channel
-	
+
 	private function _get_by_group_id($sqltype=null) {
 		$cat_array = array();
 
@@ -470,12 +480,12 @@ class Gwcode_categories {
 			// we may need to remove categories based on the depth params
 			$this->_remove_categories_by_depth();
 		}
-		
+
 		if($this->show_empty == 'no') {
 			// remove categories that have no entries
 			$this->_remove_empty_categories();
 		}
-		
+
 		if(!empty($this->excl_cat_id)) {
 			// remove categories and potential subcategories that have been provided with the excl_cat_id parameter
 			$remove_children = ($this->excl_cat_id_children == 'yes') ? true : false;
@@ -697,6 +707,13 @@ class Gwcode_categories {
 			$this->_get_custom_fields();
 		}
 
+		// I fpublisher is installed and this is a draft, grab category data from the publisher table
+		if (isset(ee()->publisher_lib) AND ee()->publisher_lib->status=='draft') {
+			$category_posts_table = 'exp_publisher_category_posts';
+		} else {
+			$category_posts_table = 'exp_category_posts';
+		}
+
 		// grab all categories from the category groups we've collected
 
 		if($this->sql_type == 1) { // most advanced query
@@ -723,7 +740,7 @@ class Gwcode_categories {
 				$sql .=	$sql_extra;
 				$sql .=	') AS entry_count ' .
 						'FROM exp_categories c ' .
-						'LEFT JOIN exp_category_posts cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
+						'LEFT JOIN '.$category_posts_table.' cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
 						'WHERE site_id IN ('.$this->EE->db->escape_str($this->site_ids).') AND group_id IN ('.$this->EE->db->escape_str($this->group_ids).') ';
 			}
 			else {
@@ -735,7 +752,7 @@ class Gwcode_categories {
 				$sql .=	$sql_extra;
 				$sql .=	') AS entry_count ' .
 						'FROM exp_categories c ' .
-						'LEFT JOIN exp_category_posts cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
+						'LEFT JOIN '.$category_posts_table.' cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
 						'LEFT JOIN exp_category_field_data cfd ON cfd.cat_id=c.cat_id ' .
 						'WHERE c.site_id IN ('.$this->EE->db->escape_str($this->site_ids).') AND c.group_id IN ('.$this->EE->db->escape_str($this->group_ids).') ';
 			}
@@ -744,17 +761,17 @@ class Gwcode_categories {
 			if($this->custom_fields == 'no') {
 				$sql =	'SELECT site_id, c.cat_id, group_id, parent_id, cat_name, cat_url_title, cat_description, cat_image, cat_order, ';
 				$sql .=	($multiple_entry_ids) ? 'group_concat(cp.entry_id separator ",") AS entry_id, ' : 'cp.entry_id, ';
-				$sql .=	'(SELECT COUNT(cp2.entry_id) FROM exp_category_posts cp2 WHERE cp2.cat_id=c.cat_id) AS entry_count ' .
+				$sql .=	'(SELECT COUNT(cp2.entry_id) FROM '.$category_posts_table.' cp2 WHERE cp2.cat_id=c.cat_id) AS entry_count ' .
 						'FROM exp_categories c ' .
-						'LEFT JOIN exp_category_posts cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
+						'LEFT JOIN '.$category_posts_table.' cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
 						'WHERE site_id IN ('.$this->EE->db->escape_str($this->site_ids).') AND group_id IN ('.$this->EE->db->escape_str($this->group_ids).') ';
 			}
 			else {
 				$sql =	'SELECT parent_id, cat_name, cat_url_title, cat_description, cat_image, cat_order, cfd.*, ';
 				$sql .=	($multiple_entry_ids) ? 'group_concat(cp.entry_id separator ",") AS entry_id, ' : 'cp.entry_id, ';
-				$sql .=	'(SELECT COUNT(cp2.entry_id) FROM exp_category_posts cp2 WHERE cp2.cat_id=c.cat_id) AS entry_count ' .
+				$sql .=	'(SELECT COUNT(cp2.entry_id) FROM '.$category_posts_table.' cp2 WHERE cp2.cat_id=c.cat_id) AS entry_count ' .
 						'FROM exp_categories c ' .
-						'LEFT JOIN exp_category_posts cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
+						'LEFT JOIN '.$category_posts_table.' cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
 						'LEFT JOIN exp_category_field_data cfd ON cfd.cat_id=c.cat_id ' .
 						'WHERE c.site_id IN ('.$this->EE->db->escape_str($this->site_ids).') AND c.group_id IN ('.$this->EE->db->escape_str($this->group_ids).') ';
 			}
@@ -763,13 +780,13 @@ class Gwcode_categories {
 			if($this->custom_fields == 'no') {
 				$sql =	'SELECT c.site_id, c.cat_id, c.group_id, c.parent_id, c.cat_name, c.cat_url_title, c.cat_description, c.cat_image, c.cat_order, ';
 				$sql .=	($multiple_entry_ids) ? 'group_concat(cp.entry_id separator ",") AS entry_id ' : 'cp.entry_id ';
-				$sql .=	'FROM exp_categories c LEFT JOIN exp_category_posts cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
+				$sql .=	'FROM exp_categories c LEFT JOIN '.$category_posts_table.' cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
 						'WHERE c.site_id IN ('.$this->EE->db->escape_str($this->site_ids).') AND c.group_id IN ('.$this->EE->db->escape_str($this->group_ids).') ';
 			}
 			else {
 				$sql =	'SELECT c.parent_id, c.cat_name, c.cat_url_title, c.cat_description, c.cat_image, c.cat_order, cfd.*, ';
 				$sql .=	($multiple_entry_ids) ? 'group_concat(cp.entry_id separator ",") AS entry_id ' : 'cp.entry_id ';
-				$sql .=	'FROM exp_categories c LEFT JOIN exp_category_posts cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
+				$sql .=	'FROM exp_categories c LEFT JOIN '.$category_posts_table.' cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
 						'LEFT JOIN exp_category_field_data cfd ON cfd.cat_id=c.cat_id ' .
 						'WHERE c.site_id=cfd.site_id AND c.site_id IN ('.$this->EE->db->escape_str($this->site_ids).') AND c.group_id IN ('.$this->EE->db->escape_str($this->group_ids).') ';
 			}
@@ -815,7 +832,7 @@ class Gwcode_categories {
 				}
 			}
 		}
-		
+
 		// we may have removed something in the array, clean up array
 		$this->categories = array_values($this->categories);
 
@@ -854,7 +871,7 @@ class Gwcode_categories {
 
 		return $this->_generate_output();
 	} // end function _get_by_entry_id
-	
+
 	private function _generate_output() {
 		if($this->style == 'linear') {
 			$linear_parse_vars_arr = array();
@@ -867,7 +884,7 @@ class Gwcode_categories {
 		// create switch_arr which holds our switch parameter values. We need to do this manually since we're not using parse_variables.
 		if(strpos($this->switch,'|') !== false) {
 			$switch_arr = explode('|',$this->switch);
-			$switch_arr = array_filter($switch_arr);		
+			$switch_arr = array_filter($switch_arr);
 		}
 		else {
 			$switch_arr = array();
@@ -920,6 +937,8 @@ class Gwcode_categories {
 			$pattern = LD.'group_heading'.RD.'(.*?)'.LD.'\/group_heading'.RD;
 			$group_heading_count = preg_match_all('/'.$pattern.'/msi', $this->gw_tagdata, $matches_arr);
 		}
+
+		$child_count = 0;
 
 		for($gw_i=0;$gw_i<$output_limit;$gw_i++) {
 			$group_start = ($this->categories[$gw_i]['cat_group_id'] != $prev_group_id) ? true : false; // do we start a new category group?
@@ -1033,6 +1052,15 @@ class Gwcode_categories {
 				$var_values_arr[$this->var_prefix.'depth'.$i.'_end_count'] = ${'depth'.$i.'_end_count'};
 			}
 			// end: add depthX_start / depthX_end / depthX_start_count / depthX_end_count variable values
+
+			// start: add child_count variable for children
+			if ($gw_i > 0 AND ($this->categories[$gw_i]['parent_id']!=$this->categories[$gw_i-1]['parent_id'])) {
+				$child_count = 1;
+			} else {
+				$child_count++;
+			}
+			$var_values_arr[$this->var_prefix.'child_count'] = $child_count;
+			// end: add child_count variable for children
 
 			// start: add custom category fields
 			if($this->custom_fields == 'yes' && !empty($this->custom_fields_arr)) {
@@ -1174,7 +1202,7 @@ class Gwcode_categories {
 			}
 		}
 	} // end function _remove_categories_by_depth
-	
+
 	private function _remove_empty_categories() {
 		// remove categories that have no entries
 		foreach($this->categories as $key => $val) {
@@ -1185,7 +1213,7 @@ class Gwcode_categories {
 		// we may have removed something in the array, clean up array
 		$this->categories = array_values($this->categories);
 	} // end function _remove_empty_categories
-	
+
 	private function _check_if_simple_list() {
 		// check if a list should be simple (1 depth) or not. For example, if we only want to show categories with depth 1 and 3, we can't show a proper nested list.
 		// we check this for every category group seperately.
@@ -1214,7 +1242,7 @@ class Gwcode_categories {
 
 	private function _get_cat_group_info($type=null) {
 		// grab the category group information we need.
-		
+
 		$group_ids = str_replace('|', ',', $this->group_id);
 
 		switch($type) {
@@ -1242,7 +1270,7 @@ class Gwcode_categories {
 			default: // _get_by_group_id
 				$sql = 'SELECT cg.group_id, group_name, field_html_formatting FROM exp_category_groups cg WHERE site_id IN ('.$this->EE->db->escape_str($this->site_ids).') AND group_id IN ('.$this->EE->db->escape_str($group_ids).')';
 				break;
-			
+
 		}
 		if(!empty($group_ids)) {
 			$sql .= ' ORDER BY FIELD(cg.group_id, '.$this->EE->db->escape_str($group_ids).')';
@@ -1260,7 +1288,7 @@ class Gwcode_categories {
 				$this->cat_id = $row['cat_id']; // we now have the cat_id that we can work with, teehee!
 			}
 		}
-		
+
 		$this->group_ids = implode(',',array_keys($this->group_id_arr));
 		return true;
 	}
