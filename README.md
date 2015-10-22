@@ -1,7 +1,7 @@
 # GWcode Categories
-## Free plugin for ExpressionEngine 2.0
+## Free plugin for ExpressionEngine 2.x
 #### By Leon Dijk - [@GWcode](http://twitter.com/#!/gwcode)
-v1.8.9
+
 ### Introduction
 
 List all, last child categories, or categories of a certain (minimum, maximum, fixed) depth, for one or more channels, for one or more category groups, for an entry or overall. Get child categories, or parent categories. Show entry count, custom category fields. And more.
@@ -27,10 +27,6 @@ For full documentation and examples, please visit:
 ### Support and Feature Requests
 Please post on the @devot_ee forums:  
 [http://devot-ee.com/add-ons/gwcode-categories/](http://devot-ee.com/add-ons/gwcode-categories/)
-
-### License
-This plugin is licensed under The BSD 3-Clause License:  
-[http://www.opensource.org/licenses/bsd-3-clause](http://www.opensource.org/licenses/bsd-3-clause)
 
 Copyright (c) 2012 Leon Dijk  
 [http://gwcode.com](http://gwcode.com)

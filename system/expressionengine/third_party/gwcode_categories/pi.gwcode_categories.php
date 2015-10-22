@@ -5,14 +5,14 @@ if(!defined('BASEPATH')) exit('No direct script access allowed');
  Created by Leon Dijk
  - http://gwcode.com/
 ------------------------------------------------------------
- This plugin is licensed under The BSD 3-Clause License.
- - http://www.opensource.org/licenses/bsd-3-clause
+ License
+ - http://creativecommons.org/licenses/by-sa/3.0/
 ============================================================
 */
 
 $plugin_info = array(
 	'pi_name'			=> 'GWcode Categories',
-	'pi_version'		=> '1.8.9',
+	'pi_version'		=> '1.9.0',
 	'pi_author'			=> 'Leon Dijk',
 	'pi_author_url'		=> 'http://gwcode.com/add-ons/gwcode-categories',
 	'pi_description'	=> 'List all, last child categories only or categories of a certain (minimum, maximum, fixed) depth, for a channel, for one or more category groups, for an entry or overall. Show the number of entries in categories, display a list of child categories for a category, create a category based breadcrumb trail and more.',
