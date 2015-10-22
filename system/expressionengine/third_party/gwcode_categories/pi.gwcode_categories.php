@@ -38,10 +38,6 @@ class Gwcode_categories {
 	private $max_depth_in_output = 1; // this will store the highest depth number in the final output
 	private $min_depth_in_output = 1; // this will store the lowest depth number in the final output
 
-	public function Gwcode_categories() {
-		$this->__construct();
-	}
-
 	public function __construct() {
 		$this->EE =& get_instance();
 
@@ -241,7 +237,7 @@ class Gwcode_categories {
 			}
 			if(count($offset_count) > 2) {
 				$this->EE->TMPL->log_item('Error: you can only provide one or two values for the "offset" parameter.');
-				return;	
+				return;
 			}
 		}
 		$this->excl_group_id = $this->EE->TMPL->fetch_param('excl_group_id');
@@ -365,7 +361,7 @@ class Gwcode_categories {
 			return $this->_get_by_group_id();
 		}
 	} // end function _get_by_channel
-	
+
 	private function _get_by_group_id($sqltype=null) {
 		$cat_array = array();
 
@@ -470,12 +466,12 @@ class Gwcode_categories {
 			// we may need to remove categories based on the depth params
 			$this->_remove_categories_by_depth();
 		}
-		
+
 		if($this->show_empty == 'no') {
 			// remove categories that have no entries
 			$this->_remove_empty_categories();
 		}
-		
+
 		if(!empty($this->excl_cat_id)) {
 			// remove categories and potential subcategories that have been provided with the excl_cat_id parameter
 			$remove_children = ($this->excl_cat_id_children == 'yes') ? true : false;
@@ -815,7 +811,7 @@ class Gwcode_categories {
 				}
 			}
 		}
-		
+
 		// we may have removed something in the array, clean up array
 		$this->categories = array_values($this->categories);
 
@@ -854,7 +850,7 @@ class Gwcode_categories {
 
 		return $this->_generate_output();
 	} // end function _get_by_entry_id
-	
+
 	private function _generate_output() {
 		if($this->style == 'linear') {
 			$linear_parse_vars_arr = array();
@@ -867,7 +863,7 @@ class Gwcode_categories {
 		// create switch_arr which holds our switch parameter values. We need to do this manually since we're not using parse_variables.
 		if(strpos($this->switch,'|') !== false) {
 			$switch_arr = explode('|',$this->switch);
-			$switch_arr = array_filter($switch_arr);		
+			$switch_arr = array_filter($switch_arr);
 		}
 		else {
 			$switch_arr = array();
@@ -1174,7 +1170,7 @@ class Gwcode_categories {
 			}
 		}
 	} // end function _remove_categories_by_depth
-	
+
 	private function _remove_empty_categories() {
 		// remove categories that have no entries
 		foreach($this->categories as $key => $val) {
@@ -1185,7 +1181,7 @@ class Gwcode_categories {
 		// we may have removed something in the array, clean up array
 		$this->categories = array_values($this->categories);
 	} // end function _remove_empty_categories
-	
+
 	private function _check_if_simple_list() {
 		// check if a list should be simple (1 depth) or not. For example, if we only want to show categories with depth 1 and 3, we can't show a proper nested list.
 		// we check this for every category group seperately.
@@ -1214,7 +1210,7 @@ class Gwcode_categories {
 
 	private function _get_cat_group_info($type=null) {
 		// grab the category group information we need.
-		
+
 		$group_ids = str_replace('|', ',', $this->group_id);
 
 		switch($type) {
@@ -1242,7 +1238,7 @@ class Gwcode_categories {
 			default: // _get_by_group_id
 				$sql = 'SELECT cg.group_id, group_name, field_html_formatting FROM exp_category_groups cg WHERE site_id IN ('.$this->EE->db->escape_str($this->site_ids).') AND group_id IN ('.$this->EE->db->escape_str($group_ids).')';
 				break;
-			
+
 		}
 		if(!empty($group_ids)) {
 			$sql .= ' ORDER BY FIELD(cg.group_id, '.$this->EE->db->escape_str($group_ids).')';
@@ -1260,7 +1256,7 @@ class Gwcode_categories {
 				$this->cat_id = $row['cat_id']; // we now have the cat_id that we can work with, teehee!
 			}
 		}
-		
+
 		$this->group_ids = implode(',',array_keys($this->group_id_arr));
 		return true;
 	}
