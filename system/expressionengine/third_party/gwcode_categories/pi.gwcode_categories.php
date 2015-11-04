@@ -55,6 +55,7 @@ class Gwcode_categories {
 			return;
 		}
 		$this->entry_id = $this->EE->TMPL->fetch_param('entry_id'); // validate later
+
 		$this->limit = $this->EE->TMPL->fetch_param('limit');
 		if(!empty($this->limit) && !is_numeric($this->limit)) {
 			$this->EE->TMPL->log_item('Error: the "limit" parameter value needs to be numeric.');
@@ -278,7 +279,6 @@ class Gwcode_categories {
 				$this->gw_tagdata .= LD.'if '.$this->var_prefix.'group_start'.RD.'<h2 class="gwcode_categories">'.LD.$this->var_prefix.'cat_group_name'.RD.'</h2>'.LD.'/if'.RD.LD.'if '.$this->var_prefix.'group_end'.RD.LD.$this->var_prefix.'cat_name'.RD.LD.'if:else'.RD.LD.$this->var_prefix.'cat_name'.RD.', '.LD.'/if'.RD;
 			}
 		}
-
 		if(!empty($this->entry_id)) {
 			// get category trail for an entry. The group_id parameter can be provided as well to only show categories from those groups!
 			if(!is_numeric(str_replace('|', '', $this->entry_id))) {
@@ -717,7 +717,7 @@ class Gwcode_categories {
 						'SELECT COUNT(cp2.entry_id) FROM exp_channel_titles ct, exp_category_posts cp2 ' .
 						'WHERE cp2.cat_id=c.cat_id AND cp2.entry_id=ct.entry_id AND ct.site_id IN ('.$this->EE->db->escape_str($this->site_ids).')';
 				$sql .=	$sql_extra;
-				$sql .=	') AS entry_count ' .
+				$sql .=	' AND cp2.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).')) AS entry_count ' .
 						'FROM exp_categories c ' .
 						'LEFT JOIN exp_category_posts cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
 						'WHERE site_id IN ('.$this->EE->db->escape_str($this->site_ids).') AND group_id IN ('.$this->EE->db->escape_str($this->group_ids).') ';
@@ -738,12 +738,12 @@ class Gwcode_categories {
 		}
 		elseif($this->sql_type == 2) { // simpler query
 			if($this->custom_fields == 'no') {
-				$sql =	'SELECT site_id, c.cat_id, group_id, parent_id, cat_name, cat_url_title, cat_description, cat_image, cat_order, ';
-				$sql .=	($multiple_entry_ids) ? 'group_concat(cp.entry_id separator ",") AS entry_id, ' : 'cp.entry_id, ';
-				$sql .=	'(SELECT COUNT(cp2.entry_id) FROM exp_category_posts cp2 WHERE cp2.cat_id=c.cat_id) AS entry_count ' .
-						'FROM exp_categories c ' .
-						'LEFT JOIN exp_category_posts cp ON c.cat_id=cp.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ' .
-						'WHERE site_id IN ('.$this->EE->db->escape_str($this->site_ids).') AND group_id IN ('.$this->EE->db->escape_str($this->group_ids).') ';
+				$sql = 'SELECT ct.site_id, c.cat_id, group_id, parent_id, cat_name, cat_url_title, cat_description, cat_image, cat_order, COUNT(cp.entry_id) AS entry_count, ';
+				$sql .=	($multiple_entry_ids) ? 'group_concat(cp.entry_id separator ",") AS entry_id ' : 'cp.entry_id ';
+				$sql .= 'FROM exp_categories c ';
+				$sql .= 'LEFT JOIN exp_category_posts cp ON cp.cat_id = c.cat_id AND cp.entry_id IN ('.$this->EE->db->escape_str($this->entry_ids).') OR cp.entry_id IS NULL ';
+				$sql .= 'INNER JOIN exp_channel_titles ct ON cp.entry_id = ct.entry_id ';
+				$sql .= 'WHERE ct.site_id IN ('.$this->EE->db->escape_str($this->site_ids).') AND c.group_id IN ('.$this->EE->db->escape_str($this->group_ids).') ';
 			}
 			else {
 				$sql =	'SELECT parent_id, cat_name, cat_url_title, cat_description, cat_image, cat_order, cfd.*, ';
@@ -771,6 +771,7 @@ class Gwcode_categories {
 			}
 		}
 		$sql .=	($multiple_entry_ids) ? 'GROUP BY c.cat_id ORDER BY site_id, group_id, parent_id, cat_order' : 'ORDER BY site_id, group_id, parent_id, cat_order';
+
 		if(!$this->_get_categories($sql)) {
 			return $this->EE->TMPL->no_results(); // no categories were found
 		}
