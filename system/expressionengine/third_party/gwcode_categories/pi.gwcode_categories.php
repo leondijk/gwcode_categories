@@ -75,6 +75,11 @@ class Gwcode_categories {
 			$this->EE->TMPL->log_item('Error: the "list_type" parameter value needs to be either "ul" or "ol".');
 			return;
 		}
+		$this->include_outer_tag = strtolower($this->EE->TMPL->fetch_param('include_outer_tag', 'yes'));
+		if($this->include_outer_tag != 'yes' && $this->include_outer_tag != 'no') {
+			$this->EE->TMPL->log_item('Error: the "include_outer_tag" parameter value needs to be either "yes" or "no".');
+			return;
+		}
 		$this->backspace = $this->EE->TMPL->fetch_param('backspace');
 		if(!empty($this->backspace) && !is_numeric($this->backspace)) {
 			$this->EE->TMPL->log_item('Error: the "backspace" parameter value needs to be numeric.');
@@ -940,15 +945,18 @@ class Gwcode_categories {
 				if(isset($simple_ul_list_arr)) { // check if current group should be simple or not
 					$simple_ul_list = ($simple_ul_list_arr[$this->categories[$gw_i]['cat_group_id']]) ? true : false;
 				}
+
 				if($this->style != 'linear') { // start new category group ul/ol
-					$gw_output_per_group .= '<'.$this->list_type;
-					if(!empty($this->id)) {
-						$gw_output_per_group .= ' id="'.$this->id.'"';
+					if ($this->include_outer_tag == 'yes' || $current_ul_depth !== 0) {
+						$gw_output_per_group .= '<'.$this->list_type;
+						if(!empty($this->id)) {
+							$gw_output_per_group .= ' id="'.$this->id.'"';
+						}
+						if(!empty($this->class)) {
+							$gw_output_per_group .= ' class="'.$this->class.'"';
+						}
+						$gw_output_per_group .= '>'."\n";
 					}
-					if(!empty($this->class)) {
-						$gw_output_per_group .= ' class="'.$this->class.'"';
-					}
-					$gw_output_per_group .= '>'."\n";
 					$current_ul_depth = 1;
 				}
 			}
@@ -1054,7 +1062,9 @@ class Gwcode_categories {
 					// we're creating a simple 1 depth ul list for this category group
 					$gw_output_per_group .= '</li>'."\n";
 					if($last_cat_to_display || $last_cat_in_group) { // if this is the very last category we're displaying, or the last in this group
-						$gw_output_per_group .= '</'.$this->list_type.'>'."\n";
+						if ($this->include_outer_tag == 'yes' || $current_ul_depth !== 0) {
+							$gw_output_per_group .= '</'.$this->list_type.'>'."\n";
+						}
 					}
 				}
 				else {
@@ -1441,6 +1451,7 @@ limit
 last_only
 style
 list_type
+include_outer_tag
 backspace
 id
 class
