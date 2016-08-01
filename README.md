@@ -1,5 +1,5 @@
 # GWcode Categories
-## Free plugin for ExpressionEngine 2.x
+## Free plugin for ExpressionEngine 3.x
 #### By Leon Dijk - [@GWcode](http://twitter.com/#!/gwcode)
 
 ### Introduction
